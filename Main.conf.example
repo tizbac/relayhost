@@ -1,0 +1,9 @@
+serveraddr=spring.clan-sy.com;
+serverport=8200;
+nick=NICK;
+password=PASSWORD;
+plugins=channels,manager,help,lag,systemlog;
+accountsnick=account1,account2,...;
+accountspass=passw1,passw2,...;
+hostports=8452,8453,8454;
+ahports=12000,12001,12002;
