@@ -13,13 +13,15 @@ def loge(s,m):
 	s.send("SAYEX autohost %s\n" % m)
 class Main:
 	ul = []
+	listfull = False
 	bots = dict()
-	def botthread(self,nick,s,r,p):
+	def botthread(self,nick,s,r,p,ist):
 		try:
 			logc(s,"Spawning "+nick)
 			d = dict()
 			d.update([("serveraddr",self.app.config["serveraddr"])])
 			d.update([("serverport",self.app.config["serverport"])])
+			d.update([("admins",self.app.config["admins"])])
 			d.update([("nick",nick)])
 			d.update([("password",p)])
 			d.update([("hostport",parselist(self.app.config["hostports"],",")[len(self.ul)-1])])
@@ -32,24 +34,33 @@ class Main:
 			p.wait()
 			logc(s,"Destroying "+nick)
 			self.ul.remove(r)
+			if len(ist.ul) < len(ist.an) and ist.listfull:
+				ist.listfull = False
+				s.send("MYSTATUS 0\n")
 		except:
 			print '-'*60
 			traceback.print_exc(file=sys.stdout)
 			print '-'*60
 	def onload(self,tasc):
+		self.tsc = tasc
 		self.app = tasc.main
+		self.an = parselist(self.app.config["accountsnick"],",")
+		self.ap = parselist(self.app.config["accountspass"],",")
 	def oncommandfromserver(self,command,args,socket):
 		try:
-			an = parselist(self.app.config["accountsnick"],",")
-			ap = parselist(self.app.config["accountspass"],",")
-			if command == "SAIDPRIVATE" and args[1] == "!spawn" and args[0] not in self.ul and len(self.ul) < len(an):
-				thread.start_new_thread(self.botthread,(an[len(self.ul)],socket,args[0],ap[len(self.ul)]))
-				socket.send("SAYPRIVATE %s %s\n" %(args[0],an[len(self.ul)]))
+
+			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and len(self.ul) < len(self.an):
+				thread.start_new_thread(self.botthread,(self.an[len(self.ul)],socket,args[0],self.ap[len(self.ul)],self))
+				socket.send("SAYPRIVATE %s %s\n" %(args[0],self.an[len(self.ul)]))
 				self.ul.append(args[0])
-			elif command == "SAIDPRIVATE" and len(self.ul) >= len(an):
+				if len(self.ul) >= len(self.an):
+					self.listfull = True
+					socket.send("MYSTATUS 1\n")
+
+			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and len(self.ul) >= len(self.an):
 				socket.send("SAYPRIVATE %s %s\n" %(args[0],"\001 Error: All bots are spawned"))
-			elif command == "SAIDPRIVATE":
-				socket.send("SAYPRIVATE %s %s\n" %(args[0],"\002"))
+			#elif command == "SAIDPRIVATE" and len(args) >= 1 and :
+			#	socket.send("SAYPRIVATE %s %s\n" %(args[0],"\002"))
 			elif command == "LEFT" and args[0] == "autohost" and len(args) > 4 and args[3] == "inconsistent" and args[1] in self.bots:
 				logc(socket,"Bot(%s) kicked by inconsistent data error , killing" % args[1])
 				try:
@@ -63,4 +74,5 @@ class Main:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
 	def onloggedin(self,socket):
-		pass		
+		if self.listfull:
+			socket.send("MYSTATUS 1\n")		
