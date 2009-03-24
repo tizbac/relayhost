@@ -214,7 +214,7 @@ class Main:
 					print s1
 					print s2
 					if s1 < 0:
-						loge(s,"*** WARNING : MyPlayerNum not found!")
+						#loge(s,"*** WARNING : MyPlayerNum not found!")
 						s1 = 0
 						s2 = len(self.script)-1
 					else:					
