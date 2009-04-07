@@ -50,12 +50,12 @@ class Main:
 		self.disabled = bool(int(self.app.config["enabled"]))
 	def oncommandfromserver(self,command,args,socket):
 		try:
-			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!enable":
+			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!enable" and args[0] in self.app.admins:
 				self.disabled = False
 				socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Hosting new games enabled"))
 				self.app.SaveConfig()
-			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!disable":
+			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!disable" and args[0] in self.app.admins:
 				self.disabled = True
 				socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Hosting new games disabled"))
