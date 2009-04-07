@@ -259,4 +259,7 @@ class Main:
 				os.kill(os.getpid(),signal.SIGKILL)
 			self.noowner = True
 	def onloggedin(self,socket):
-		pass	
+		self.noowner = True
+		self.hosted = 0	
+		if self.ingame == 1:
+			socket.send("MYSTATUS 1\n")

@@ -15,6 +15,7 @@ class Main:
 	ul = []
 	listfull = False
 	bots = dict()
+	disabled = False
 	def botthread(self,nick,s,r,p,ist):
 		try:
 			logc(s,"Spawning "+nick)
@@ -46,10 +47,13 @@ class Main:
 		self.app = tasc.main
 		self.an = parselist(self.app.config["accountsnick"],",")
 		self.ap = parselist(self.app.config["accountspass"],",")
+		self.disabled = bool(int(self.app.config["enabled"]))
 	def oncommandfromserver(self,command,args,socket):
 		try:
-
-			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and len(self.ul) < len(self.an):
+			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!enable":
+				self.disabled = False
+				socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
+			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and len(self.ul) < len(self.an) and not self.disabled:
 				thread.start_new_thread(self.botthread,(self.an[len(self.ul)],socket,args[0],self.ap[len(self.ul)],self))
 				socket.send("SAYPRIVATE %s %s\n" %(args[0],self.an[len(self.ul)]))
 				self.ul.append(args[0])
@@ -74,5 +78,4 @@ class Main:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
 	def onloggedin(self,socket):
-		if self.listfull:
-			socket.send("MYSTATUS 1\n")		
+		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))		
