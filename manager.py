@@ -53,8 +53,15 @@ class Main:
 			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!enable":
 				self.disabled = False
 				socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
+				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Hosting new games enabled"))
+				self.app.SaveConfig()
+			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!disable":
+				self.disabled = True
+				socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))
+				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Hosting new games disabled"))
+				self.app.SaveConfig()
 			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and len(self.ul) < len(self.an) and not self.disabled:
-				thread.start_new_thread(self.botthread,(self.an[len(self.ul)],socket,args[0],self.ap[len(self.ul)],self))
+				self.threads.append(thread.start_new_thread(self.botthread,(self.an[len(self.ul)],socket,args[0],self.ap[len(self.ul)],self)))
 				socket.send("SAYPRIVATE %s %s\n" %(args[0],self.an[len(self.ul)]))
 				self.ul.append(args[0])
 				if len(self.ul) >= len(self.an):
