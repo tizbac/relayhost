@@ -98,7 +98,7 @@ class Main:
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(os.environ['HOME'],"%f.txt" % g ))
 		
-			self.pr = subprocess.Popen(("spring-dedicated",os.path.join(os.environ['HOME'],"%f.txt" % g )))
+			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )))
 			status = self.pr.wait()
 		
 			et = time.time()

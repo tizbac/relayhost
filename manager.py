@@ -22,6 +22,7 @@ class Main:
 			d = dict()
 			d.update([("serveraddr",self.app.config["serveraddr"])])
 			d.update([("serverport",self.app.config["serverport"])])
+			d.update([("springdedpath",self.app.config["springdedpath"])])
 			d.update([("admins",self.app.config["admins"])])
 			d.update([("nick",nick)])
 			d.update([("password",p)])
