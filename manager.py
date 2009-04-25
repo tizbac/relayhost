@@ -102,7 +102,7 @@ class Main:
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Done."))
 			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and len(self.ul) < len(self.an) and not self.disabled:
 				if args[0] in self.bans:
-					socket.send("SAYPRIVATE %s %s\n" %(args[0],"You are banned!"))
+					socket.send("SAYPRIVATE %s %s\n" %(args[0],"\001 Error: You are banned!"))
 					return
 				self.threads.append(thread.start_new_thread(self.botthread,(self.an[len(self.ul)],socket,args[0],self.ap[len(self.ul)],self)))
 				socket.send("SAYPRIVATE %s %s\n" %(args[0],self.an[len(self.ul)]))
