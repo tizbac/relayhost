@@ -148,7 +148,7 @@ class Main:
 			self.users.update([(args[0],0)])
 		if command == "CLIENTSTATUS" and len(args) > 1:
 			self.users.update([(args[0],int(args[1]))])
-		if command == "SAIDPRIVATE" and args[0] not in self.config["bannedusers"] and args[0] == self.config["spawnedby"]:
+		if command == "SAIDPRIVATE" and args[0] not in self.config["bannedusers"] and args[0] == self.app.config["spawnedby"]:
 			if args[1] == "!openbattle" and not self.hosted == 1:
 				if len(args) < 6:
 					print "Got invalid openbattle with params:"+" ".join(args)
