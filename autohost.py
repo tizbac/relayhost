@@ -232,9 +232,13 @@ class Main:
 				pm(s,args[0],"E2 | Battle is not hosted")
 			
 		if command == "OPENBATTLE":
-			self.hosted = 1
+			
 			self.battleid = int(args[0])
 			self.used = 1
+			loge(s,"Battle hosted succesfully , id is %s" % args[0])
+		if command == "JOINEDBATTLE" and len(args) == 2 and int(args[0]) == self.battleid and args[1] == self.app.config["spawnedby"]:
+			self.hosted = 1 
+			loge(s,"The host has joined the battle")	
 		if command == "SERVERMSG":
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
