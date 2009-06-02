@@ -257,7 +257,7 @@ class Main:
 			
 		if command == "REMOVEUSER" and args[0] == self.battleowner:
 			if  not self.gamestarted == 1:
-				loge(s,"The host disconnected and game not started, exiting"
+				loge(s,"The host disconnected and game not started, exiting")
 				try:
 					os.kill(self.pr.pid,signal.SIGKILL)
 				except:
