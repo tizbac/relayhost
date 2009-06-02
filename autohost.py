@@ -79,8 +79,9 @@ class Main:
 		while 1:
 			time.sleep(20.0)
 			try:
-				if not self.hosted == 1 and not self.ingame == 1:
+				if not ( not self.noowner and self.hosted == 1) and not self.ingame == 1:
 					print "Timeouted hosting"
+					
 					os.kill(os.getpid(),signal.SIGKILL)
 			except:
 				pass
@@ -97,10 +98,10 @@ class Main:
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(os.environ['HOME'],"%f.txt" % g ))
-		
+			loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['HOME'],"%f.txt" % g )))
 			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )))
 			status = self.pr.wait()
-		
+			loge(socket,"*** Spring has exited with status %i" % status )
 			et = time.time()
 		
 			"""lns = j.split("\n")
@@ -125,6 +126,7 @@ class Main:
 		self.ingame = 0
 		self.gamestarted = 0
 		if self.noowner == True:
+			loge(socket,"The host is no longer in the battle, exiting")
 			print "Exiting"
 			os.kill(os.getpid(),signal.SIGKILL)
 	def onload(self,tasc):
@@ -243,7 +245,7 @@ class Main:
 			pm(s,self.battleowner," ".join(args))
 		if command == "LEFTBATTLE" and int(args[0]) == self.battleid and args[1] == self.battleowner:
 			if  not self.gamestarted == 1:
-				print "Exiting"
+				loge(s,"The host has left the battle and the game isn't running, exiting")
 				s.send("LEAVEBATTLE\n")
 				try:
 					os.kill(self.pr.pid,signal.SIGKILL)
@@ -252,16 +254,17 @@ class Main:
 				os.kill(os.getpid(),signal.SIGKILL)
 				
 			self.noowner = True
-
+			
 		if command == "REMOVEUSER" and args[0] == self.battleowner:
 			if  not self.gamestarted == 1:
-				print "Exiting"
+				loge(s,"The host disconnected and game not started, exiting"
 				try:
 					os.kill(self.pr.pid,signal.SIGKILL)
 				except:
 					pass
 				os.kill(os.getpid(),signal.SIGKILL)
 			self.noowner = True
+			
 	def onloggedin(self,socket):
 		self.noowner = True
 		self.hosted = 0	
