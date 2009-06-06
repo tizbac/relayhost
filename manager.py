@@ -8,9 +8,15 @@ import signal
 import traceback
 import subprocess
 def logc(s,m):
-	s.send("SAY autohost %s\n" % m)
+	try:
+		s.send("SAY autohost %s\n" % m)
+	except:
+		pass
 def loge(s,m):
-	s.send("SAYEX autohost %s\n" % m)
+	try:
+		s.send("SAYEX autohost %s\n" % m)
+	except:
+		pass
 class Main:
 	ul = []
 	listfull = False

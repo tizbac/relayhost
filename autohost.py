@@ -11,12 +11,21 @@ import traceback
 import sys
 from utilities import *
 def pm(s,p,m):
-	print yellow+"PM To:%s, Message: %s" %(p,m) + normal
-	s.send("SAYPRIVATE %s %s\n" %(p,m))
+	try:
+		print yellow+"PM To:%s, Message: %s" %(p,m) + normal
+		s.send("SAYPRIVATE %s %s\n" %(p,m))
+	except:
+		pass
 def logc(s,m):
-	s.send("SAY autohost %s\n" % m)
+	try:
+		s.send("SAY autohost %s\n" % m)
+	except:
+		pass
 def loge(s,m):
-	s.send("SAYEX autohost %s\n" % m)
+	try:
+		s.send("SAYEX autohost %s\n" % m)
+	except:
+		pass
 class Main:
 	sock = 0
 	hosted = 0
