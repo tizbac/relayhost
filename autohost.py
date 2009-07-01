@@ -205,6 +205,8 @@ class Main:
 					s.send("REMOVEBOT "+" ".join(args[2:])+"\n")
 				if args[1] == "!updatebot" and args[0] == self.battleowner:
 					s.send("UPDATEBOT "+" ".join(args[2:])+"\n")
+				if args[1] == "!ring" and args[0] == self.battleowner:
+					s.send("RING "+" ".join(args[2:])+"\n")
 				if args[1] == "!forcespectatormode" and args[0] == self.battleowner:
 					s.send("FORCESPECTATORMODE "+" ".join(args[2:])+"\n")
 				if args[1] == "!cleanscript" and args[0] == self.battleowner:
