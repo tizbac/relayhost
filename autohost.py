@@ -196,7 +196,7 @@ class Main:
 				if args[1] == "!forceallyno" and args[0] == self.battleowner:
 					s.send("FORCEALLYNO "+" ".join(args[2:])+"\n")
 				if args[1] == "!forceteamno" and args[0] == self.battleowner:
-					s.send("FROCETEAMNO "+" ".join(args[2:])+"\n")
+					s.send("FORCETEAMNO "+" ".join(args[2:])+"\n")
 				if args[1] == "!disableunits" and args[0] == self.battleowner:
 					s.send("DISABLEUNITS "+" ".join(args[2:])+"\n")
 				if args[1] == "!enableallunits" and args[0] == self.battleowner:
