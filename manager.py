@@ -22,6 +22,7 @@ class Main:
 	listfull = False
 	bots = dict()
 	disabled = False
+	botstatus = dict()
 	def botthread(self,nick,s,r,p,ist):
 		try:
 			logc(s,"Spawning (Requested by %s) " % r +nick)
@@ -39,13 +40,14 @@ class Main:
 			writeconfigfile(nick+".cfg",d)
 			p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
 			self.bots.update([(nick,p.pid)])
-			print self.bots
+			#print self.bots
 			p.wait()
 			logc(s,"Destroying "+nick)
 			self.ul.remove(r)
-			if len(ist.ul) < len(ist.an) and ist.listfull:
+			
+			if ist.listfull:
 				ist.listfull = False
-				s.send("MYSTATUS 0\n")
+				ist.updatestatus()
 		except:
 			print '-'*60
 			traceback.print_exc(file=sys.stdout)
@@ -59,6 +61,10 @@ class Main:
 		self.an = parselist(self.app.config["accountsnick"],",")
 		self.ap = parselist(self.app.config["accountspass"],",")
 		self.disabled = not bool(int(self.app.config["enabled"]))
+		i = 0
+		for bot in self.an:
+			self.botstatus.update([(i,False)])
+			i += 1
 	def oncommandfromserver(self,command,args,socket):
 		try:
 			if command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!enable" and args[0] in self.app.admins:
@@ -106,19 +112,30 @@ class Main:
 				self.config["bans"] = ','.join(self.bans)
 				writeconfigfile("Manager.conf",self.config)
 				socket.send("SAYPRIVATE %s %s\n" % (args[0],"Done."))
-			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and len(self.ul) < len(self.an) and not self.disabled:
+			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and args[0] not in self.ul and not self.disabled:
 				if args[0] in self.bans:
 					socket.send("SAYPRIVATE %s %s\n" %(args[0],"\001 Error: You are banned!"))
 					return
-				self.threads.append(thread.start_new_thread(self.botthread,(self.an[len(self.ul)],socket,args[0],self.ap[len(self.ul)],self)))
-				socket.send("SAYPRIVATE %s %s\n" %(args[0],self.an[len(self.ul)]))
-				self.ul.append(args[0])
-				if len(self.ul) >= len(self.an):
-					self.listfull = True
-					socket.send("MYSTATUS 1\n")
+				freeslot = False
+				slot = 0
+				for b in self.botstatus:
+					if not self.botstatus[b]:
+						freeslot = True
+						slot = b
+						break
+				if freeslot:
+					self.threads.append(thread.start_new_thread(self.botthread,(self.an[slot],socket,args[0],self.ap[slot],self)))
+					socket.send("SAYPRIVATE %s %s\n" %(args[0],self.an[slot]))
+					self.ul.append(args[0])
+					self.botstatus[slot] = True
+					if b + 1 == len(self.botstatus): # The bot spawned was the last one
+						self.listfull = True
+						socket.send("MYSTATUS 1\n")
+				else:
+					socket.send("SAYPRIVATE %s %s\n" %(args[0],"\001 Error: All bots are spawned"))
 
-			elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and len(self.ul) >= len(self.an):
-				socket.send("SAYPRIVATE %s %s\n" %(args[0],"\001 Error: All bots are spawned"))
+			#elif command == "SAIDPRIVATE" and len(args) == 2 and args[1] == "!spawn" and len(self.ul) >= len(self.an):
+			#	socket.send("SAYPRIVATE %s %s\n" %(args[0],"\001 Error: All bots are spawned"))
 			#elif command == "SAIDPRIVATE" and len(args) >= 1 and :
 			#	socket.send("SAYPRIVATE %s %s\n" %(args[0],"\002"))
 			elif command == "LEFT" and args[0] == "autohost" and len(args) > 4 and args[3] == "inconsistent" and args[1] in self.bots:
@@ -133,5 +150,7 @@ class Main:
 			for line in exc:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
+	def updatestatus(self):
+		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))	
 	def onloggedin(self,socket):
-		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))		
+		self.updatestatus()	
