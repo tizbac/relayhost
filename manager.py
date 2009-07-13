@@ -47,7 +47,7 @@ class Main:
 			
 			if ist.listfull:
 				ist.listfull = False
-				ist.updatestatus()
+				ist.updatestatus(s)
 		except:
 			print '-'*60
 			traceback.print_exc(file=sys.stdout)
@@ -150,7 +150,7 @@ class Main:
 			for line in exc:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
-	def updatestatus(self):
+	def updatestatus(self,socket):
 		socket.send("MYSTATUS %i\n" % int(int(self.listfull)+int(self.disabled)*2))	
 	def onloggedin(self,socket):
-		self.updatestatus()	
+		self.updatestatus(socket)	
