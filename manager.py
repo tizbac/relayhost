@@ -48,7 +48,7 @@ class Main:
 			if ist.listfull:
 				ist.listfull = False
 				ist.updatestatus(s)
-				ist.botstatus[slot] = False
+			ist.botstatus[slot] = False
 		except:
 			print '-'*60
 			traceback.print_exc(file=sys.stdout)
