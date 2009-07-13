@@ -23,7 +23,7 @@ class Main:
 	bots = dict()
 	disabled = False
 	botstatus = dict()
-	def botthread(self,nick,s,r,p,ist):
+	def botthread(self,slot,nick,s,r,p,ist):
 		try:
 			logc(s,"Spawning (Requested by %s) " % r +nick)
 			d = dict()
@@ -34,8 +34,8 @@ class Main:
 			d.update([("admins",self.app.config["admins"])])
 			d.update([("nick",nick)])
 			d.update([("password",p)])
-			d.update([("hostport",parselist(self.app.config["hostports"],",")[len(self.ul)-1])])
-			d.update([("ahport",parselist(self.app.config["ahports"],",")[len(self.ul)-1])])
+			d.update([("hostport",parselist(self.app.config["hostports"],",")[slot])])
+			d.update([("ahport",parselist(self.app.config["ahports"],",")[slot])])
 			d.update([("plugins","channels,autohost,help")])
 			writeconfigfile(nick+".cfg",d)
 			p = subprocess.Popen(("python","Main.py","-c", "%s" % (nick+".cfg")),stdout=sys.stdout)
@@ -48,6 +48,7 @@ class Main:
 			if ist.listfull:
 				ist.listfull = False
 				ist.updatestatus(s)
+				ist.botstatus[slot] = False
 		except:
 			print '-'*60
 			traceback.print_exc(file=sys.stdout)
@@ -124,7 +125,7 @@ class Main:
 						slot = b
 						break
 				if freeslot:
-					self.threads.append(thread.start_new_thread(self.botthread,(self.an[slot],socket,args[0],self.ap[slot],self)))
+					self.threads.append(thread.start_new_thread(self.botthread,(slot,self.an[slot],socket,args[0],self.ap[slot],self)))
 					socket.send("SAYPRIVATE %s %s\n" %(args[0],self.an[slot]))
 					self.ul.append(args[0])
 					self.botstatus[slot] = True
