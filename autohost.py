@@ -119,10 +119,10 @@ class Main:
 			loge(socket,"*** Spring has exited with status %i" % status )
 			et = time.time()
 		
-			lns = self.output.split("\n")
+			
 			if status != 0:
 				socket.send("SAYBATTLEEX *** Error: Spring Exited with status %i\n" % status)
-				g = j.split("\n")
+				g = self.output.split("\n")
 				for h in g:
 					socket.send("SAYBATTLEEX *** "+h+"\n")
 					time.sleep(float(len(h))/1024.0+0.05)
