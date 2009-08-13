@@ -97,28 +97,35 @@ class Main:
 			
 	def startspring(self,socket,g):
 		try:
+			
 			self.gamestarted = 0
 			self.u.reset()
 			if self.ingame == 1:
 				socket.send("SAYBATTLEEX *** Error: game is already running\n")
 				return
+			self.output = ""
 			self.ingame = 1
 			socket.send("SAYBATTLEEX *** Starting game...\n")
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(os.environ['HOME'],"%f.txt" % g ))
 			loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['HOME'],"%f.txt" % g )))
-			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )))
+			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+			l = self.pr.stdout.readline()
+			while len(l) > 0:
+				self.output += l
+				l = stdout.readline()
 			status = self.pr.wait()
 			loge(socket,"*** Spring has exited with status %i" % status )
 			et = time.time()
 		
-			"""lns = j.split("\n")
-			if status != 0 or lns[len(lns)-2].startswith("Exception raised:") or et - st < 2.0:
+			lns = self.output.split("\n")
+			if status != 0:
 				socket.send("SAYBATTLEEX *** Error: Spring Exited with status %i\n" % status)
 				g = j.split("\n")
 				for h in g:
-					socket.send("SAYBATTLEEX *** "+h+"\n")"""
+					socket.send("SAYBATTLEEX *** "+h+"\n")
+					time.sleep(float(len(h))/1024.0+0.05)
 			socket.send("MYSTATUS 0\n")
 			socket.send("SAYBATTLEEX *** Game ended\n")
 		except:
