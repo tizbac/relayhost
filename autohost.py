@@ -114,7 +114,7 @@ class Main:
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
 				self.output += l
-				l = stdout.readline()
+				l = self.pr.stdout.readline()
 			status = self.pr.wait()
 			loge(socket,"*** Spring has exited with status %i" % status )
 			et = time.time()
