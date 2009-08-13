@@ -124,8 +124,8 @@ class Main:
 				socket.send("SAYBATTLEEX *** Error: Spring Exited with status %i\n" % status)
 				g = self.output.split("\n")
 				for h in g:
-					socket.send("SAYBATTLEEX *** "+h+"\n")
-					time.sleep(float(len(h))/1024.0+0.05)
+					loge(socket,"*** STDOUT+STDERR: "+h)
+					time.sleep(float(len(h))/900.0+0.05)
 			socket.send("MYSTATUS 0\n")
 			socket.send("SAYBATTLEEX *** Game ended\n")
 		except:
