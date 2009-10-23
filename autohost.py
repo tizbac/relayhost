@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from colors import *
 from ParseConfig import *
 import commands
@@ -8,6 +9,7 @@ import time
 import udpinterface
 import subprocess
 import traceback
+import platform
 import sys
 from utilities import *
 def pm(s,p,m):
@@ -109,8 +111,12 @@ class Main:
 			socket.send("MYSTATUS 1\n")
 			st = time.time()
 			#status,j = commands.getstatusoutput("spring-dedicated "+os.path.join(os.environ['HOME'],"%f.txt" % g ))
-			loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['HOME'],"%f.txt" % g )))
-			self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+			if platform.system() == "Linux":
+			  loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['HOME'],"%f.txt" % g )))
+			  self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+			else:
+			  loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )))
+			  self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
 				self.output += l
@@ -228,7 +234,10 @@ class Main:
 						os.remove(os.path.join(os.environ['HOME'],"%f.txt" % g))
 					except:
 						pass
-					f = open(os.path.join(os.environ['HOME'],"%f.txt" % g),"aw")
+					if platform.system() == "Linux":
+					  f = open(os.path.join(os.environ['HOME'],"%f.txt" % g),"a")
+					else:
+					  f = open(os.path.join(os.environ['USERPROFILE'],"%f.txt" % g),"a")
 					s1 = self.script.find("MyPlayerNum=")
 					s2 = self.script[s1:].find(";")+1+s1
 					print s1
