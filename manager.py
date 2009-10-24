@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from colors import *
 from ParseConfig import *
 import commands
@@ -7,6 +8,9 @@ import sys
 import signal
 import traceback
 import subprocess
+import platform
+if platform.system() == "Windows":
+  import win32api
 def logc(s,m):
 	try:
 		s.send("SAY autohost %s\n" % m)
@@ -142,7 +146,11 @@ class Main:
 			elif command == "LEFT" and args[0] == "autohost" and len(args) > 4 and args[3] == "inconsistent" and args[1] in self.bots:
 				logc(socket,"Bot(%s) kicked by inconsistent data error , killing" % args[1])
 				try:
-					os.kill(self.bots[args[1]],signal.SIGKILL)
+					if platform.system() == "Windows":
+					  handle = win32api.OpenProcess(1, 0, self.bots[args[1]])
+					  win32api.TerminateProcess(handle, 0)
+					else:
+					  os.kill(self.bots[args[1]],signal.SIGKILL)
 				except:
 					pass
 		except:

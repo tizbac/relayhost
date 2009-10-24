@@ -11,6 +11,8 @@ import subprocess
 import traceback
 import platform
 import sys
+if platform.system() == "Windows":
+  import win32api
 from utilities import *
 def pm(s,p,m):
 	try:
@@ -92,12 +94,16 @@ class Main:
 			try:
 				if not ( not self.noowner and self.hosted == 1) and not self.ingame == 1:
 					print "Timeouted hosting"
-					
-					os.kill(os.getpid(),signal.SIGKILL)
+					if platform.system() == "Windows":
+					  handle = win32api.OpenProcess(1, 0, os.getpid())
+					  win32api.TerminateProcess(handle, 0)
+					else:
+					  os.kill(os.getpid(),signal.SIGKILL)
 			except:
 				pass
 			
 	def startspring(self,socket,g):
+		cwd = os.getcwd()
 		try:
 			
 			self.gamestarted = 0
@@ -116,6 +122,7 @@ class Main:
 			  self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['HOME'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 			else:
 			  loge(socket,"*** Starting spring: command line \"%s\"" % (self.app.config["springdedpath"]+" "+os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )))
+			  os.chdir("\\".join(self.app.config["springdedpath"].replace("/","\\").split("\\")[:self.app.config["springdedpath"].replace("/","\\").count("\\")]))
 			  self.pr = subprocess.Popen((self.app.config["springdedpath"],os.path.join(os.environ['USERPROFILE'],"%f.txt" % g )),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 			l = self.pr.stdout.readline()
 			while len(l) > 0:
@@ -140,17 +147,23 @@ class Main:
 			for line in exc:
 				loge(socket,line)
 			loge(socket,"*** EXCEPTION: END")
+			os.chdir(cwd)
 		try:
 			if int(self.config["keepscript"]) == 0:
 				os.remove(os.path.join(os.environ['HOME'],"%f.txt" % g))
 		except:
 			pass
+		os.chdir(cwd)
 		self.ingame = 0
 		self.gamestarted = 0
 		if self.noowner == True:
 			loge(socket,"The host is no longer in the battle, exiting")
 			print "Exiting"
-			os.kill(os.getpid(),signal.SIGKILL)
+			if platform.system() == "Windows":
+			  handle = win32api.OpenProcess(1, 0, os.getpid())
+			  win32api.TerminateProcess(handle, 0)
+			else:
+			  os.kill(os.getpid(),signal.SIGKILL)
 	def onload(self,tasc):
 		try:
 			self.app = tasc.main
@@ -275,10 +288,18 @@ class Main:
 				loge(s,"The host has left the battle and the game isn't running, exiting")
 				s.send("LEAVEBATTLE\n")
 				try:
-					os.kill(self.pr.pid,signal.SIGKILL)
+				  if platform.system() == "Windows":
+				    handle = win32api.OpenProcess(1, 0, self.pr.pid)
+				    win32api.TerminateProcess(handle, 0)
+				  else:
+				    os.kill(self.pr.pid,signal.SIGKILL)
 				except:
 					pass
-				os.kill(os.getpid(),signal.SIGKILL)
+				if platform.system() == "Windows":
+				  handle = win32api.OpenProcess(1, 0, os.getpid())
+				  win32api.TerminateProcess(handle, 0)
+				else:
+				  os.kill(os.getpid(),signal.SIGKILL)
 				
 			self.noowner = True
 			
@@ -286,10 +307,18 @@ class Main:
 			if  not self.gamestarted == 1:
 				loge(s,"The host disconnected and game not started, exiting")
 				try:
-					os.kill(self.pr.pid,signal.SIGKILL)
+				  if platform.system() == "Windows":
+				    handle = win32api.OpenProcess(1, 0, self.pr.pid)
+				    win32api.TerminateProcess(handle, 0)
+				  else:
+				    os.kill(self.pr.pid,signal.SIGKILL)
 				except:
 					pass
-				os.kill(os.getpid(),signal.SIGKILL)
+				if platform.system() == "Windows":
+				  handle = win32api.OpenProcess(1, 0, os.getpid())
+				  win32api.TerminateProcess(handle, 0)
+				else:
+				  os.kill(os.getpid(),signal.SIGKILL)
 			self.noowner = True
 			
 	def onloggedin(self,socket):

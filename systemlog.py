@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from colors import *
 from ParseConfig import *
 import time
@@ -30,7 +31,7 @@ class Main:
 		  
 		except:
 		  pass
-		self.f = open("logs/LOG.txt","aw")
+		self.f = open("logs/LOG.txt","a")
 		self.f.write("[%s] " % (datetime.datetime.fromtimestamp(time.mktime(datetime.datetime.now().timetuple())).ctime()))
 		self.f.write("********** CONNECTED ***********\n")
 		self.f.flush()
